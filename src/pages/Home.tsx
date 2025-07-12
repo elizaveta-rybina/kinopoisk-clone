@@ -1,3 +1,9 @@
+import { HomeContent } from '@/widgets'
+
 export const Home = () => {
-	return <div>Home</div>
+	return (
+		<div>
+			<HomeContent />
+		</div>
+	)
 }
