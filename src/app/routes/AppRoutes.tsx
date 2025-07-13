@@ -1,4 +1,5 @@
 import { Home } from '@/pages'
+import { MovieDetail } from '@/pages/Movie'
 import { NavBar } from '@/shared'
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
 
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
 			{
 				index: true,
 				element: <Home />
+			},
+			{
+				path: 'movie/:id',
+				element: <MovieDetail />
 			}
 		]
 	}

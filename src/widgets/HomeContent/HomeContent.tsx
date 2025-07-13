@@ -28,7 +28,7 @@ export const HomeContent = () => {
 	// }, [])
 
 	return (
-		<div className='max-w-7xl min-h-screen text-white pt-20 mx-auto w-full'>
+		<div className='max-w-9/10 min-h-screen text-white mx-auto w-full'>
 			<div className='flex flex-col lg:flex-row gap-6 px-4 pt-10'>
 				<aside className='w-full lg:w-1/4'>
 					<MovieFilter />
@@ -49,7 +49,7 @@ export const HomeContent = () => {
 						</div>
 					)}
 
-					<div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+					<div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
 						{movies.map((movie: Movie, index: number) => (
 							<MovieCard
 								key={`${movie.id}-${index}`}

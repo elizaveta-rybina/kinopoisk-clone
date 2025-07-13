@@ -1,3 +1,60 @@
-export const Movie = () => {
-	return <div>Movie</div>
+import { getMovieById } from '@/app/api'
+import type { Movie } from '@/app/api/types'
+import { BackButton } from '@/shared'
+import {
+	MovieDetailActions,
+	MovieDetailGenres,
+	MovieDetailHeader,
+	MovieDetailStats
+} from '@/widgets'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+
+export const MovieDetail = () => {
+	const { id } = useParams<{ id: string }>()
+	const [movie, setMovie] = useState<Movie | null>(null)
+	const [error, setError] = useState<string | null>(null)
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (!id) {
+			setError('Movie ID is missing')
+			return
+		}
+
+		getMovieById(id)
+			.then(data => setMovie(data))
+			.catch(err =>
+				setError(`Failed to load movie: ${err.message || 'Unknown error'}`)
+			)
+	}, [id])
+
+	console.log(movie)
+
+	if (error) return <div className='text-red-500 p-6'>{error}</div>
+	if (!movie) return <div className='text-gray-800 p-6'>Загрузка...</div>
+
+	return (
+		<div className='relative flex min-h-screen pt-20 px-16'>
+			<div className='w-1/2 flex flex-col justify-start px-10 py-12 bg-white/90 backdrop-blur-sm z-10'>
+				<BackButton navigate={navigate} />
+				<MovieDetailHeader movie={movie} />
+				<MovieDetailStats movie={movie} />
+				<MovieDetailGenres movie={movie} />
+				<p className='p-0 m-0'>{movie.description}</p>
+				<div className='mt-10'>
+					<MovieDetailActions />
+				</div>
+			</div>
+			<div className='w-1/2 flex justify-center items-center'>
+				<div className='max-w-[90%] max-h-[90vh] rounded-xl overflow-hidden shadow-xl'>
+					<img
+						src={movie.poster.url}
+						alt={`${movie.name} poster`}
+						className='w-full h-full object-contain'
+					/>
+				</div>
+			</div>
+		</div>
+	)
 }

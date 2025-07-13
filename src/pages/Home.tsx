@@ -2,7 +2,7 @@ import { HomeContent } from '@/widgets'
 
 export const Home = () => {
 	return (
-		<div>
+		<div className='pt-20'>
 			<HomeContent />
 		</div>
 	)

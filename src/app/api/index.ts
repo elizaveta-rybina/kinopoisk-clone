@@ -64,7 +64,7 @@ export function getMovieById(id: string): Promise<Movie> {
 	if (!id.trim()) {
 		throw new Error('Movie ID is required')
 	}
-	return fetchFromApi<Movie>(`/movie/${id}`)
+	return fetchFromApi<Movie>(`/v1.4/movie/${id}`)
 }
 
 export function getGenres(): Promise<GenreResponse[]> {
