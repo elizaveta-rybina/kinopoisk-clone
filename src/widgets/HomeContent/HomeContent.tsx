@@ -29,7 +29,7 @@ export const HomeContent = () => {
 
 	return (
 		<div className='max-w-7xl min-h-screen text-white pt-20 mx-auto w-full'>
-			<div className='flex flex-col lg:flex-row gap-6 px-4'>
+			<div className='flex flex-col lg:flex-row gap-6 px-4 pt-10'>
 				<aside className='w-full lg:w-1/4'>
 					<MovieFilter />
 				</aside>

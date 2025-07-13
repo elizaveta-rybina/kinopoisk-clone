@@ -51,9 +51,13 @@ export function getMovies(
 	searchParams.set('votes.kp<=', '10000000')
 
 	// Логируем URL для отладки
-	console.log(`Request URL: ${API_BASE_URL}/movie?${searchParams.toString()}`)
+	console.log(
+		`Request URL: ${API_BASE_URL}/v1.4/movie?${searchParams.toString()}`
+	)
 
-	return fetchFromApi<ApiResponse<Movie>>(`/movie?${searchParams.toString()}`)
+	return fetchFromApi<ApiResponse<Movie>>(
+		`/v1.4/movie?${searchParams.toString()}`
+	)
 }
 
 export function getMovieById(id: string): Promise<Movie> {
@@ -65,7 +69,7 @@ export function getMovieById(id: string): Promise<Movie> {
 
 export function getGenres(): Promise<GenreResponse[]> {
 	return fetchFromApi<GenreResponse[]>(
-		'/movie/possible-values-by-field?field=genres.name'
+		'/v1/movie/possible-values-by-field?field=genres.name'
 	)
 }
 
@@ -78,7 +82,7 @@ export function searchMovies(query: string): Promise<SearchResponse> {
 	searchParams.set('query', query)
 
 	return fetchFromApi<SearchResponse>(
-		`/movie/search?${searchParams.toString()}`
+		`/v1.4/movie/search?${searchParams.toString()}`
 	)
 }
 

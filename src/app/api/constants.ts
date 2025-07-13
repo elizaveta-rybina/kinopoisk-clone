@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'https://api.kinopoisk.dev/v1.4'
+export const API_BASE_URL = 'https://api.kinopoisk.dev'
 export const API_KEY = import.meta.env.VITE_KINOPOISK_API_KEY
 
 if (!API_KEY) {
