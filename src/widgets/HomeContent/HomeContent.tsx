@@ -1,12 +1,17 @@
 import type { Movie } from '@/app/api/types'
-import { genresStore } from '@/app/store/genres' // Adjust path as needed
+import { favoritesStore } from '@/app/store/favorites'
+import { genresStore } from '@/app/store/genres'
 import { useMovies } from '@/features/movies'
+import { Modal } from '@/shared'
 import { MovieCard, MovieFilter } from '@/widgets'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 export const HomeContent = () => {
 	const [searchParams] = useSearchParams()
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
+	const [isAddingToFavorites, setIsAddingToFavorites] = useState(true)
 
 	const filters = useMemo(
 		() => ({
@@ -27,6 +32,29 @@ export const HomeContent = () => {
 	useEffect(() => {
 		genresStore.fetchGenres()
 	}, [])
+
+	const handleFavoriteClick = (movie: Movie) => {
+		setSelectedMovie(movie)
+		setIsAddingToFavorites(!favoritesStore.isFavorite(movie.id))
+		setIsModalOpen(true)
+	}
+
+	const handleConfirmFavorite = () => {
+		if (selectedMovie) {
+			if (isAddingToFavorites) {
+				favoritesStore.addFavorite(selectedMovie)
+			} else {
+				favoritesStore.removeFavorite(selectedMovie.id)
+			}
+		}
+		setIsModalOpen(false)
+		setSelectedMovie(null)
+	}
+
+	const handleCloseModal = () => {
+		setIsModalOpen(false)
+		setSelectedMovie(null)
+	}
 
 	return (
 		<div className='max-w-9/10 min-h-screen text-white mx-auto w-full relative'>
@@ -56,6 +84,7 @@ export const HomeContent = () => {
 								key={`${movie.id}-${index}`}
 								movie={movie}
 								ref={index === movies.length - 1 ? lastMovieElementRef : null}
+								onFavoriteClick={handleFavoriteClick}
 							/>
 						))}
 					</div>
@@ -82,6 +111,14 @@ export const HomeContent = () => {
 					)}
 				</main>
 			</div>
+
+			<Modal
+				isOpen={isModalOpen}
+				onClose={handleCloseModal}
+				onConfirm={handleConfirmFavorite}
+				movieName={selectedMovie?.name || ''}
+				isAdding={isAddingToFavorites}
+			/>
 		</div>
 	)
 }
