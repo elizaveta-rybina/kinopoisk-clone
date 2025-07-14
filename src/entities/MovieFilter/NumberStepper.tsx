@@ -52,7 +52,7 @@ export const NumberStepper = ({
 					max={max}
 					step={step}
 					onChange={handleInputChange}
-					className='w-16 text-black text-center rounded-2xl p-1 border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-400 appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden'
+					className='w-16 text-black text-center rounded-2xl p-1 border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-400 appearance-none [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden'
 				/>
 				<button
 					onClick={() => handleChange(step)}

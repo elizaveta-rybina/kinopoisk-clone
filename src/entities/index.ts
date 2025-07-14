@@ -1,2 +1,8 @@
 export { FavoriteButton, MovieInfoOverlay, MoviePoster } from './MovieCard'
-export { NumberStepper, GenreSelector } from './MovieFilter'
+export {
+	MovieDetailActions,
+	MovieDetailGenres,
+	MovieDetailHeader,
+	MovieDetailStats
+} from './MovieDetails'
+export { GenreSelector, NumberStepper } from './MovieFilter'
