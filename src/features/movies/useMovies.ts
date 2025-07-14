@@ -18,6 +18,9 @@ const DEFAULT_FILTERS: MovieFilters = {
 
 const PAGE_LIMIT = 50
 
+// Cache to store movies by filter and page
+const movieCache = new Map<string, Movie[]>()
+
 export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 	const [movies, setMovies] = useState<Movie[]>([])
 	const [page, setPage] = useState(1)
@@ -26,6 +29,19 @@ export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 	const [error, setError] = useState<string | null>(null)
 	const observer = useRef<IntersectionObserver | null>(null)
 	const isInitialFetch = useRef(true)
+
+	// Create a cache key based on filters and page
+	const cacheKey = useMemo(
+		() =>
+			JSON.stringify({
+				genres: filters.genres?.sort() ?? DEFAULT_FILTERS.genres,
+				rating: filters.rating ?? DEFAULT_FILTERS.rating,
+				yearMin: filters.yearMin ?? DEFAULT_FILTERS.yearMin,
+				yearMax: filters.yearMax ?? DEFAULT_FILTERS.yearMax,
+				page
+			}),
+		[filters.genres, filters.rating, filters.yearMin, filters.yearMax, page]
+	)
 
 	const memoizedFilters = useMemo(
 		() => ({
@@ -41,6 +57,17 @@ export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 	const loadMovies = useCallback(async () => {
 		if (isLoading || !hasMore || error) return
 
+		// Check cache first
+		const cachedMovies = movieCache.get(cacheKey)
+		if (cachedMovies) {
+			setMovies(prev =>
+				page === 1 ? cachedMovies : [...prev, ...cachedMovies]
+			)
+			setHasMore(cachedMovies.length === PAGE_LIMIT)
+			setPage(prev => prev + 1)
+			return
+		}
+
 		setIsLoading(true)
 		try {
 			const { docs }: ApiResponse<Movie> = await getMovies({
@@ -49,7 +76,12 @@ export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 				...memoizedFilters
 			})
 
-			setMovies(prev => (page === 1 ? docs : [...prev, ...docs]))
+			setMovies(prev => {
+				const newMovies = page === 1 ? docs : [...prev, ...docs]
+				// Store in cache
+				movieCache.set(cacheKey, docs)
+				return newMovies
+			})
 			setHasMore(docs.length === PAGE_LIMIT)
 			setPage(prev => prev + 1)
 		} catch (err) {
@@ -58,7 +90,7 @@ export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [page, hasMore, error, memoizedFilters])
+	}, [cacheKey, page, hasMore, error, memoizedFilters])
 
 	// Reset state on filter change
 	useEffect(() => {
@@ -93,7 +125,7 @@ export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 
 			if (node) observer.current.observe(node)
 		},
-		[isLoading, hasMore, error, loadMovies]
+		[isLoading, hasMore, loadMovies]
 	)
 
 	return { movies, isLoading, hasMore, error, lastMovieElementRef }
