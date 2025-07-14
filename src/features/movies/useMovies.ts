@@ -3,98 +3,92 @@ import type { ApiResponse, Movie } from '@/app/api/types'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 interface MovieFilters {
-	genres: string[]
-	rating: { min: number; max: number }
-	yearMin: number
-	yearMax: number
+	genres?: string[]
+	rating?: { min: number; max: number }
+	yearMin?: number
+	yearMax?: number
 }
 
-export const useMovies = (
-	filters: MovieFilters = {
-		genres: [],
-		rating: { min: 0, max: 10 },
-		yearMin: 1990,
-		yearMax: 2025
-	}
-) => {
+const DEFAULT_FILTERS: MovieFilters = {
+	genres: [],
+	rating: { min: 0, max: 10 },
+	yearMin: 1990,
+	yearMax: 2025
+}
+
+const PAGE_LIMIT = 50
+
+export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 	const [movies, setMovies] = useState<Movie[]>([])
 	const [page, setPage] = useState(1)
 	const [isLoading, setIsLoading] = useState(false)
 	const [hasMore, setHasMore] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const observer = useRef<IntersectionObserver | null>(null)
-	const isFetched = useRef(false)
+	const isInitialFetch = useRef(true)
 
 	const memoizedFilters = useMemo(
 		() => ({
-			genres: [...filters.genres],
-			rating: { ...filters.rating },
-			year: `${filters.yearMin}-${filters.yearMax}`
+			genres: filters.genres ?? DEFAULT_FILTERS.genres,
+			rating: filters.rating ?? DEFAULT_FILTERS.rating,
+			year: `${filters.yearMin ?? DEFAULT_FILTERS.yearMin}-${
+				filters.yearMax ?? DEFAULT_FILTERS.yearMax
+			}`
 		}),
-		[
-			filters.genres,
-			filters.rating.min,
-			filters.rating.max,
-			filters.yearMin,
-			filters.yearMax
-		]
+		[filters.genres, filters.rating, filters.yearMin, filters.yearMax]
 	)
 
-	// Debounce loadMovies to prevent rapid API calls
 	const loadMovies = useCallback(async () => {
 		if (isLoading || !hasMore || error) return
-		setIsLoading(true)
-		setError(null)
 
+		setIsLoading(true)
 		try {
-			const data: ApiResponse<Movie> = await getMovies({
+			const { docs }: ApiResponse<Movie> = await getMovies({
 				page,
-				limit: 50, // Reduced limit for faster initial load
-				genres: memoizedFilters.genres,
-				rating: memoizedFilters.rating,
-				year: memoizedFilters.year
+				limit: PAGE_LIMIT,
+				...memoizedFilters
 			})
 
-			setMovies(prev => (page === 1 ? data.docs : [...prev, ...data.docs]))
-			setHasMore(data.docs.length === 50)
+			setMovies(prev => (page === 1 ? docs : [...prev, ...docs]))
+			setHasMore(docs.length === PAGE_LIMIT)
 			setPage(prev => prev + 1)
-		} catch (err: any) {
-			setError(err.message || 'Не удалось загрузить фильмы')
+		} catch (err) {
+			setError((err as Error).message || 'Failed to load movies')
 			setHasMore(false)
 		} finally {
 			setIsLoading(false)
 		}
-	}, [page, hasMore, memoizedFilters])
+	}, [page, hasMore, error, memoizedFilters])
 
-	// Reset state when filters change
+	// Reset state on filter change
 	useEffect(() => {
 		setMovies([])
 		setPage(1)
 		setHasMore(true)
 		setError(null)
-		isFetched.current = false
+		isInitialFetch.current = true
 	}, [memoizedFilters])
 
 	// Initial load
 	useEffect(() => {
-		if (isFetched.current) return
-		isFetched.current = true
+		if (!isInitialFetch.current) return
+		isInitialFetch.current = false
 		loadMovies()
 	}, [loadMovies])
 
-	// Intersection observer for infinite scroll
+	// Infinite scroll observer
 	const lastMovieElementRef = useCallback(
 		(node: HTMLDivElement | null) => {
-			if (isLoading || error) return
-			if (observer.current) observer.current.disconnect()
+			if (isLoading || !hasMore || error) return
+			observer.current?.disconnect()
 
 			observer.current = new IntersectionObserver(
-				entries => {
-					if (entries[0].isIntersecting && hasMore && !error) {
+				([entry]) => {
+					if (entry.isIntersecting) {
 						loadMovies()
 					}
 				},
-				{ threshold: 0.1 } // Trigger earlier for smoother loading
+				{ threshold: 0.1 }
 			)
 
 			if (node) observer.current.observe(node)

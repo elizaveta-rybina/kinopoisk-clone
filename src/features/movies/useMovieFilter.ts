@@ -1,26 +1,37 @@
 import { genresStore } from '@/app/store/genres'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+
+interface Filters {
+	genres: string[]
+	ratingMin: number
+	yearMin: number
+}
+
+const DEFAULT_FILTERS: Filters = {
+	genres: [],
+	ratingMin: 7.0,
+	yearMin: 2010
+}
 
 export const useMovieFilter = () => {
 	const [searchParams, setSearchParams] = useSearchParams()
-	const [genres, setGenres] = useState<string[]>(
-		searchParams.get('genres')?.split(',').filter(Boolean) || []
-	)
-	const [ratingMin, setRatingMin] = useState<number>(
-		parseFloat(searchParams.get('rating.min') || '7.0')
-	)
-	const [yearMin, setYearMin] = useState<number>(
-		parseInt(searchParams.get('yearMin') || '2010', 10)
-	)
+	const [filters, setFilters] = useState<Filters>(() => ({
+		genres:
+			searchParams.get('genres')?.split(',').filter(Boolean) ??
+			DEFAULT_FILTERS.genres,
+		ratingMin: Number.parseFloat(
+			searchParams.get('rating.min') ?? DEFAULT_FILTERS.ratingMin.toString()
+		),
+		yearMin: Number.parseInt(
+			searchParams.get('yearMin') ?? DEFAULT_FILTERS.yearMin.toString(),
+			10
+		)
+	}))
 	const [genresError, setGenresError] = useState<string | null>(null)
 
-	// Use genresStore for availableGenres
 	const availableGenres = useMemo(
-		() =>
-			genresStore.genres.length > 0
-				? genresStore.genres.map(genre => genre.name)
-				: [],
+		() => genresStore.genres.map(genre => genre.name),
 		[genresStore.genres]
 	)
 
@@ -28,29 +39,22 @@ export const useMovieFilter = () => {
 		if (genresStore.genres.length === 0 && !genresStore.isLoading) {
 			genresStore.fetchGenres().catch(err => {
 				setGenresError(
-					err instanceof Error
-						? err.message
-						: 'Не удалось загрузить жанры. Используется пустой список.'
+					err instanceof Error ? err.message : 'Failed to load genres'
 				)
 			})
 		}
 	}, [])
 
-	const filters = useMemo(
-		() => ({ genres, ratingMin, yearMin }),
-		[genres, ratingMin, yearMin]
-	)
-
 	useEffect(() => {
 		const newParams = {
-			genres: genres.join(','),
-			'rating.min': ratingMin.toFixed(1), // Round to 1 decimal place
-			yearMin: yearMin.toString()
+			genres: filters.genres.join(','),
+			'rating.min': filters.ratingMin.toFixed(1),
+			yearMin: filters.yearMin.toString()
 		}
 
 		const currentParams = Object.fromEntries(searchParams)
 		const hasChanged = Object.entries(newParams).some(
-			([key, value]) => currentParams[key] !== value
+			([key, value]) => value && currentParams[key] !== value
 		)
 
 		if (hasChanged) {
@@ -58,27 +62,23 @@ export const useMovieFilter = () => {
 		}
 	}, [filters, setSearchParams])
 
-	const handleGenreChange = (newGenres: string[]) => {
-		setGenres(newGenres)
-	}
+	const handleGenreChange = useCallback((newGenres: string[]) => {
+		setFilters(prev => ({ ...prev, genres: newGenres }))
+	}, [])
 
-	const onFilterChange = (filters: {
-		genres?: string[]
-		ratingMin?: number
-		yearMin?: number
-	}) => {
-		if (filters.genres !== undefined) setGenres(filters.genres)
-		if (filters.ratingMin !== undefined) {
-			// Round to 1 decimal place to fix step issue
-			setRatingMin(Math.round(filters.ratingMin * 10) / 10)
-		}
-		if (filters.yearMin !== undefined) setYearMin(filters.yearMin)
-	}
+	const onFilterChange = useCallback((newFilters: Partial<Filters>) => {
+		setFilters(prev => ({
+			...prev,
+			...newFilters,
+			ratingMin:
+				newFilters.ratingMin !== undefined
+					? Math.round(newFilters.ratingMin * 10) / 10
+					: prev.ratingMin
+		}))
+	}, [])
 
 	return {
-		genres,
-		ratingMin,
-		yearMin,
+		...filters,
 		availableGenres,
 		genresError,
 		handleGenreChange,
