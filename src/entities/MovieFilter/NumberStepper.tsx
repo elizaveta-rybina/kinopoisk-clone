@@ -29,10 +29,9 @@ export const NumberStepper = ({
 	}
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newValue = Math.min(
-			Math.max(parseFloat(e.target.value) || min, min),
-			max
-		)
+		// Replace comma with dot for decimal input
+		const rawValue = e.target.value.replace(',', '.')
+		const newValue = Math.min(Math.max(parseFloat(rawValue) || min, min), max)
 		setLocalValue(newValue)
 		onChange(newValue)
 	}
@@ -53,7 +52,7 @@ export const NumberStepper = ({
 					max={max}
 					step={step}
 					onChange={handleInputChange}
-					className='w-16 text-black text-center rounded-2xl p-1 border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-400'
+					className='w-16 text-black text-center rounded-2xl p-1 border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-400 appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden'
 				/>
 				<button
 					onClick={() => handleChange(step)}

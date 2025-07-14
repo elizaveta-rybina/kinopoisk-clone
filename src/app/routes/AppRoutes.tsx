@@ -1,4 +1,4 @@
-import { Home } from '@/pages'
+import { FavoritesPage, Home } from '@/pages'
 import { MovieDetail } from '@/pages/Movie'
 import { NavBar } from '@/shared'
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
@@ -22,6 +22,10 @@ const router = createBrowserRouter([
 			{
 				path: 'movie/:id',
 				element: <MovieDetail />
+			},
+			{
+				path: 'favorites',
+				element: <FavoritesPage />
 			}
 		]
 	}

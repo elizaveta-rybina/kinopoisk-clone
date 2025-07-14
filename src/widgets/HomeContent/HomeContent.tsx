@@ -1,7 +1,8 @@
 import type { Movie } from '@/app/api/types'
+import { genresStore } from '@/app/store/genres' // Adjust path as needed
 import { useMovies } from '@/features/movies'
 import { MovieCard, MovieFilter } from '@/widgets'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 export const HomeContent = () => {
@@ -23,12 +24,12 @@ export const HomeContent = () => {
 	const { movies, isLoading, hasMore, error, lastMovieElementRef } =
 		useMovies(filters)
 
-	// const handleFilterChange = useCallback((newFilters: typeof filters) => {
-	// 	// Triggered by MovieFilter, useMovies reacts to filter changes
-	// }, [])
+	useEffect(() => {
+		genresStore.fetchGenres()
+	}, [])
 
 	return (
-		<div className='max-w-9/10 min-h-screen text-white mx-auto w-full'>
+		<div className='max-w-9/10 min-h-screen text-white mx-auto w-full relative'>
 			<div className='flex flex-col lg:flex-row gap-6 px-4 pt-10'>
 				<aside className='w-full lg:w-1/4'>
 					<MovieFilter />

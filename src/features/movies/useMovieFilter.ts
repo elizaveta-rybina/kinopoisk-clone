@@ -1,4 +1,4 @@
-import kinoApi from '@/app/api'
+import { genresStore } from '@/app/store/genres'
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
@@ -13,22 +13,27 @@ export const useMovieFilter = () => {
 	const [yearMin, setYearMin] = useState<number>(
 		parseInt(searchParams.get('yearMin') || '2010', 10)
 	)
-	const [availableGenres, setAvailableGenres] = useState<string[]>([])
 	const [genresError, setGenresError] = useState<string | null>(null)
 
+	// Use genresStore for availableGenres
+	const availableGenres = useMemo(
+		() =>
+			genresStore.genres.length > 0
+				? genresStore.genres.map(genre => genre.name)
+				: [],
+		[genresStore.genres]
+	)
+
 	useEffect(() => {
-		kinoApi
-			.getGenres()
-			.then(data => {
-				setAvailableGenres(data.map(genre => genre.name))
-				setGenresError(null)
-			})
-			.catch(() => {
+		if (genresStore.genres.length === 0 && !genresStore.isLoading) {
+			genresStore.fetchGenres().catch(err => {
 				setGenresError(
-					'Не удалось загрузить жанры. Используется пустой список.'
+					err instanceof Error
+						? err.message
+						: 'Не удалось загрузить жанры. Используется пустой список.'
 				)
-				setAvailableGenres([])
 			})
+		}
 	}, [])
 
 	const filters = useMemo(
@@ -39,7 +44,7 @@ export const useMovieFilter = () => {
 	useEffect(() => {
 		const newParams = {
 			genres: genres.join(','),
-			'rating.min': ratingMin.toString(),
+			'rating.min': ratingMin.toFixed(1), // Round to 1 decimal place
 			yearMin: yearMin.toString()
 		}
 
@@ -63,7 +68,10 @@ export const useMovieFilter = () => {
 		yearMin?: number
 	}) => {
 		if (filters.genres !== undefined) setGenres(filters.genres)
-		if (filters.ratingMin !== undefined) setRatingMin(filters.ratingMin)
+		if (filters.ratingMin !== undefined) {
+			// Round to 1 decimal place to fix step issue
+			setRatingMin(Math.round(filters.ratingMin * 10) / 10)
+		}
 		if (filters.yearMin !== undefined) setYearMin(filters.yearMin)
 	}
 
