@@ -7,7 +7,7 @@ export const NavBar = () => {
 				</h1>
 				<div>
 					<button className='bg-orange-200 px-6 py-2 rounded-2xl cursor-pointer text-gray-600 hover:bg-orange-300 transition-colors'>
-						Мое избранное
+						<a href='favorites'>Мое избранное</a>
 					</button>
 				</div>
 			</div>

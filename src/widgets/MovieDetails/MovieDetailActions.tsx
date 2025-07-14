@@ -1,10 +1,30 @@
-import { FaHeart } from 'react-icons/fa'
+import type { Movie } from '@/app/api/types'
+import { favoritesStore } from '@/app/store/favorites'
+import { observer } from 'mobx-react-lite'
 
-export const MovieDetailActions = () => {
-	return (
-		<button className='flex items-center gap-2 bg-amber-500  hover:bg-orange-600 text-white px-6 py-3 rounded-full text-lg font-semibold w-fit transition'>
-			<FaHeart />
-			Добавить в избранное
-		</button>
-	)
+interface MovieDetailActionsProps {
+  movie: Movie
+  onFavoriteClick?: (movie: Movie) => void
 }
+
+export const MovieDetailActions = observer(
+  ({ movie, onFavoriteClick }: MovieDetailActionsProps) => {
+    const isFavorited = favoritesStore.isFavorite(movie.id)
+
+    const handleClick = (e: React.MouseEvent) => {
+      e.stopPropagation()
+      if (onFavoriteClick) {
+        onFavoriteClick(movie)
+      }
+    }
+
+    return (
+      <button
+        className='inline-flex justify-center rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-amber-600 transition-colors duration-300'
+        onClick={handleClick}
+      >
+        {isFavorited ? 'Удалить из избранного' : 'Добавить в избранное'}
+      </button>
+    )
+  }
+)

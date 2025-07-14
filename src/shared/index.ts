@@ -1,1 +1,1 @@
-export { BackButton, NavBar } from './ui'
+export { BackButton, Modal, NavBar } from './ui'

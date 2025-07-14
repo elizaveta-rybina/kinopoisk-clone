@@ -1,6 +1,7 @@
 import { getMovieById } from '@/app/api'
 import type { Movie } from '@/app/api/types'
-import { BackButton } from '@/shared'
+import { favoritesStore } from '@/app/store/favorites'
+import { BackButton, Modal } from '@/shared'
 import {
 	MovieDetailActions,
 	MovieDetailGenres,
@@ -14,6 +15,8 @@ export const MovieDetail = () => {
 	const { id } = useParams<{ id: string }>()
 	const [movie, setMovie] = useState<Movie | null>(null)
 	const [error, setError] = useState<string | null>(null)
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [isAddingToFavorites, setIsAddingToFavorites] = useState(true)
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -29,7 +32,25 @@ export const MovieDetail = () => {
 			)
 	}, [id])
 
-	console.log(movie)
+	const handleFavoriteClick = (movie: Movie) => {
+		setIsAddingToFavorites(!favoritesStore.isFavorite(movie.id))
+		setIsModalOpen(true)
+	}
+
+	const handleConfirmFavorite = () => {
+		if (movie) {
+			if (isAddingToFavorites) {
+				favoritesStore.addFavorite(movie)
+			} else {
+				favoritesStore.removeFavorite(movie.id)
+			}
+		}
+		setIsModalOpen(false)
+	}
+
+	const handleCloseModal = () => {
+		setIsModalOpen(false)
+	}
 
 	if (error) return <div className='text-red-500 p-6'>{error}</div>
 	if (!movie) return <div className='text-gray-800 p-6'>Загрузка...</div>
@@ -43,7 +64,10 @@ export const MovieDetail = () => {
 				<MovieDetailGenres movie={movie} />
 				<p className='p-0 m-0'>{movie.description}</p>
 				<div className='mt-10'>
-					<MovieDetailActions />
+					<MovieDetailActions
+						movie={movie}
+						onFavoriteClick={handleFavoriteClick}
+					/>
 				</div>
 			</div>
 			<div className='w-1/2 flex justify-center items-center'>
@@ -55,6 +79,13 @@ export const MovieDetail = () => {
 					/>
 				</div>
 			</div>
+			<Modal
+				isOpen={isModalOpen}
+				onClose={handleCloseModal}
+				onConfirm={handleConfirmFavorite}
+				movieName={movie.name}
+				isAdding={isAddingToFavorites}
+			/>
 		</div>
 	)
 }

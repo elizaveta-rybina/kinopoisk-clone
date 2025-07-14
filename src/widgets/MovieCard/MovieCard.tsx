@@ -13,30 +13,28 @@ export const MovieCard = observer(
 	forwardRef<HTMLDivElement, MovieCardProps>(
 		({ movie, onFavoriteClick }, ref) => {
 			const navigate = useNavigate()
-			const [isButtonVisible, setIsButtonVisible] = useState(false)
+			const [isHovered, setIsHovered] = useState(false)
 
 			const handleClick = useCallback(() => {
-				if (!isButtonVisible) {
-					navigate(`/movie/${movie.id}`)
-				}
-			}, [navigate, movie.id, isButtonVisible])
+				navigate(`/movie/${movie.id}`)
+			}, [navigate, movie.id])
 
 			return (
 				<div
 					ref={ref}
 					onClick={handleClick}
+					onMouseEnter={() => setIsHovered(true)}
+					onMouseLeave={() => setIsHovered(false)}
 					className='relative aspect-[2/3] w-full max-w-[220px] group transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:z-10 cursor-pointer'
-					onMouseEnter={() => setIsButtonVisible(true)}
-					onMouseLeave={() => setIsButtonVisible(false)}
 				>
 					<div className='relative w-full h-full'>
 						<MoviePoster
-							posterUrl={movie.poster.previewUrl}
+							posterUrl={movie.poster?.previewUrl ?? ''}
 							name={movie.name}
 						/>
 						<FavoriteButton
 							movie={movie}
-							isVisible={isButtonVisible}
+							isVisible={isHovered}
 							onFavoriteClick={onFavoriteClick}
 						/>
 						<MovieInfoOverlay
