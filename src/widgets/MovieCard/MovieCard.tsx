@@ -13,6 +13,7 @@ export const MovieCard = observer(
 	forwardRef<HTMLDivElement, MovieCardProps>(
 		({ movie, onFavoriteClick }, ref) => {
 			const navigate = useNavigate()
+			const isMobile = window.innerWidth < 768
 			const [isHovered, setIsHovered] = useState(false)
 
 			const handleClick = useCallback(() => {
@@ -34,7 +35,7 @@ export const MovieCard = observer(
 						/>
 						<FavoriteButton
 							movie={movie}
-							isVisible={isHovered}
+							isVisible={isHovered || isMobile}
 							onFavoriteClick={onFavoriteClick}
 						/>
 						<MovieInfoOverlay

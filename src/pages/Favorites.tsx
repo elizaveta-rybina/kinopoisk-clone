@@ -38,14 +38,18 @@ export const FavoritesPage = observer(() => {
 	}
 
 	return (
-		<div className='pt-25 px-5 max-w-9/10 min-h-screen text-white mx-auto w-full relative'>
+		<div className='pt-20 md:pt-20 lg:pt-25 px-4 sm:px-5 max-w-[95%] md:max-w-[90%] min-h-screen text-white mx-auto w-full relative'>
 			<BackButton navigate={navigate} />
-			<h1 className='text-4xl font-bold text-gray-800 mb-6'>Мое избранное</h1>
+			<h1 className='text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 sm:mb-5 md:mb-6'>
+				Мое избранное
+			</h1>
 
 			{favorites.length === 0 ? (
-				<p className='text-gray-700 text-2xl'>Нет избранных фильмов</p>
+				<p className='text-gray-700 text-lg sm:text-xl md:text-2xl'>
+					Нет избранных фильмов
+				</p>
 			) : (
-				<div className='grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4'>
+				<div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3 sm:gap-4'>
 					{favorites.map(movie => (
 						<MovieCard
 							key={movie.id}
