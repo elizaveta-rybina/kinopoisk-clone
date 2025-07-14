@@ -67,11 +67,11 @@ export interface GetMoviesParams {
 	page?: number
 	limit?: number
 	year?: string
-	rating?: { min: number; max: number } // Изменено на объект
+	rating?: { min: number; max: number }
 	genres?: string[]
 	selectFields?: MovieField[]
-	sortField?: SortField // Изменено на одиночное значение
-	sortType?: SortType // Изменено на одиночное значение
+	sortField?: SortField
+	sortType?: SortType
 	type?: MovieType
 	movieLength?: string | number
 }

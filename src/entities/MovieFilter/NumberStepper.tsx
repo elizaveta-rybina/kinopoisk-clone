@@ -30,13 +30,13 @@ export const NumberStepper = ({
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const rawValue = e.target.value.replace(',', '.')
-		setLocalValue(rawValue) // Сохраняем сырой ввод пользователя
+		setLocalValue(rawValue)
 	}
 
 	const handleBlur = () => {
-		const parsedValue = parseInt(localValue as string, 10) // Используем parseInt для годов
+		const parsedValue = parseInt(localValue as string, 10)
 		if (isNaN(parsedValue) || localValue === '') {
-			setLocalValue(min) // Если ввод некорректен, устанавливаем минимальное значение
+			setLocalValue(min)
 			onChange(min)
 			return
 		}
@@ -68,7 +68,7 @@ export const NumberStepper = ({
 					max={max}
 					step={step}
 					onChange={handleInputChange}
-					onBlur={handleBlur} // Обрабатываем завершение ввода
+					onBlur={handleBlur}
 					className='w-12 sm:w-16 text-sm sm:text-base text-black text-center rounded-2xl p-1 sm:p-2 border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-400 appearance-none [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden'
 				/>
 
