@@ -30,29 +30,37 @@ export const NumberStepper = ({
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const rawValue = e.target.value.replace(',', '.')
-		// Allow empty input
-		if (rawValue === '') {
-			setLocalValue('')
+		setLocalValue(rawValue) // Сохраняем сырой ввод пользователя
+	}
+
+	const handleBlur = () => {
+		const parsedValue = parseInt(localValue as string, 10) // Используем parseInt для годов
+		if (isNaN(parsedValue) || localValue === '') {
+			setLocalValue(min) // Если ввод некорректен, устанавливаем минимальное значение
+			onChange(min)
 			return
 		}
-		// Only update if valid number
-		const parsedValue = parseFloat(rawValue)
-		if (!isNaN(parsedValue)) {
-			const newValue = Math.min(Math.max(parsedValue, min), max)
-			setLocalValue(newValue)
-			onChange(newValue)
-		}
+		const newValue = Math.min(Math.max(parsedValue, min), max)
+		setLocalValue(newValue)
+		onChange(newValue)
 	}
+
+	const isMinDisabled = Number(localValue) <= min
+	const isMaxDisabled = Number(localValue) >= max
 
 	return (
 		<div className='space-y-1 sm:space-y-2'>
 			<div className='flex items-center space-x-1 sm:space-x-2'>
 				<button
 					onClick={() => handleChange(-step)}
-					className='bg-orange-300 text-white p-1 sm:p-2 text-sm sm:text-base rounded-2xl hover:bg-orange-500'
+					disabled={isMinDisabled}
+					className={`bg-orange-300 text-white p-1 sm:p-2 text-sm sm:text-base rounded-2xl hover:bg-orange-500 transition-colors ${
+						isMinDisabled ? 'opacity-50 cursor-not-allowed' : ''
+					}`}
 				>
 					<FaArrowLeftLong />
 				</button>
+
 				<input
 					type='number'
 					value={localValue}
@@ -60,11 +68,16 @@ export const NumberStepper = ({
 					max={max}
 					step={step}
 					onChange={handleInputChange}
+					onBlur={handleBlur} // Обрабатываем завершение ввода
 					className='w-12 sm:w-16 text-sm sm:text-base text-black text-center rounded-2xl p-1 sm:p-2 border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-400 appearance-none [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden'
 				/>
+
 				<button
 					onClick={() => handleChange(step)}
-					className='bg-orange-300 text-white p-1 sm:p-2 text-sm sm:text-base rounded-2xl hover:bg-orange-500'
+					disabled={isMaxDisabled}
+					className={`bg-orange-300 text-white p-1 sm:p-2 text-sm sm:text-base rounded-2xl hover:bg-orange-500 transition-colors ${
+						isMaxDisabled ? 'opacity-50 cursor-not-allowed' : ''
+					}`}
 				>
 					<FaArrowRightLong />
 				</button>

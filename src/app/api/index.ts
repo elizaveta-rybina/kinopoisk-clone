@@ -8,8 +8,6 @@ import type {
 	SearchResponse
 } from './types'
 
-import { API_BASE_URL } from './constants'
-
 export function getMovies(
 	params: GetMoviesParams = {}
 ): Promise<ApiResponse<Movie>> {
@@ -32,10 +30,9 @@ export function getMovies(
 	searchParams.set('limit', limit.toString())
 
 	if (type) searchParams.set('type', type)
-	if (year) searchParams.set('year', year.toString())
+	if (year) searchParams.set('year', year)
 	if (rating) {
-		searchParams.set('rating.kp>=', rating.min.toString())
-		searchParams.set('rating.kp<=', rating.max.toString())
+		searchParams.set('rating.kp', `${rating.min}-${rating.max}`)
 	}
 	if (movieLength) searchParams.set('movieLength', movieLength.toString())
 
@@ -50,10 +47,9 @@ export function getMovies(
 	searchParams.set('votes.kp>=', '10000')
 	searchParams.set('votes.kp<=', '10000000')
 
-	// Логируем URL для отладки
-	console.log(
-		`Request URL: ${API_BASE_URL}/v1.4/movie?${searchParams.toString()}`
-	)
+	// console.log(
+	// 	`Request URL: ${API_BASE_URL}/v1.4/movie?${searchParams.toString()}`
+	// )
 
 	return fetchFromApi<ApiResponse<Movie>>(
 		`/v1.4/movie?${searchParams.toString()}`

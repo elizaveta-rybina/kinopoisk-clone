@@ -66,7 +66,7 @@ export type MovieType = 'movie' | 'tv-series' | 'cartoon' | 'anime'
 export interface GetMoviesParams {
 	page?: number
 	limit?: number
-	year?: string | number
+	year?: string
 	rating?: { min: number; max: number } // Изменено на объект
 	genres?: string[]
 	selectFields?: MovieField[]

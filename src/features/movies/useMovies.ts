@@ -18,7 +18,6 @@ const DEFAULT_FILTERS: MovieFilters = {
 
 const PAGE_LIMIT = 50
 
-// Cache to store movies by filter and page
 const movieCache = new Map<string, Movie[]>()
 
 export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
@@ -30,7 +29,6 @@ export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 	const observer = useRef<IntersectionObserver | null>(null)
 	const isInitialFetch = useRef(true)
 
-	// Create a cache key based on filters and page
 	const cacheKey = useMemo(
 		() =>
 			JSON.stringify({
@@ -57,7 +55,6 @@ export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 	const loadMovies = useCallback(async () => {
 		if (isLoading || !hasMore || error) return
 
-		// Check cache first
 		const cachedMovies = movieCache.get(cacheKey)
 		if (cachedMovies) {
 			setMovies(prev =>
@@ -70,21 +67,17 @@ export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 
 		setIsLoading(true)
 		try {
-			const { docs }: ApiResponse<Movie> = await getMovies({
-				page,
-				limit: PAGE_LIMIT,
-				...memoizedFilters
-			})
-
+			const params = { page, limit: PAGE_LIMIT, ...memoizedFilters }
+			const { docs }: ApiResponse<Movie> = await getMovies(params)
 			setMovies(prev => {
 				const newMovies = page === 1 ? docs : [...prev, ...docs]
-				// Store in cache
 				movieCache.set(cacheKey, docs)
 				return newMovies
 			})
 			setHasMore(docs.length === PAGE_LIMIT)
 			setPage(prev => prev + 1)
 		} catch (err) {
+			console.error('useMovies: API error', err)
 			setError((err as Error).message || 'Failed to load movies')
 			setHasMore(false)
 		} finally {
@@ -92,23 +85,21 @@ export const useMovies = (filters: MovieFilters = DEFAULT_FILTERS) => {
 		}
 	}, [cacheKey, page, hasMore, error, memoizedFilters])
 
-	// Reset state on filter change
 	useEffect(() => {
 		setMovies([])
 		setPage(1)
 		setHasMore(true)
 		setError(null)
+		movieCache.clear()
 		isInitialFetch.current = true
 	}, [memoizedFilters])
 
-	// Initial load
 	useEffect(() => {
 		if (!isInitialFetch.current) return
 		isInitialFetch.current = false
 		loadMovies()
 	}, [loadMovies])
 
-	// Infinite scroll observer
 	const lastMovieElementRef = useCallback(
 		(node: HTMLDivElement | null) => {
 			if (isLoading || !hasMore || error) return

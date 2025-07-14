@@ -5,13 +5,17 @@ import { useSearchParams } from 'react-router-dom'
 interface Filters {
 	genres: string[]
 	ratingMin: number
+	ratingMax: number
 	yearMin: number
+	yearMax: number
 }
 
 const DEFAULT_FILTERS: Filters = {
 	genres: [],
 	ratingMin: 7.0,
-	yearMin: 2010
+	ratingMax: 10.0,
+	yearMin: 2010,
+	yearMax: 2025
 }
 
 export const useMovieFilter = () => {
@@ -25,8 +29,15 @@ export const useMovieFilter = () => {
 			ratingMin: Number.parseFloat(
 				searchParams.get('rating.min') ?? DEFAULT_FILTERS.ratingMin.toString()
 			),
+			ratingMax: Number.parseFloat(
+				searchParams.get('rating.max') ?? DEFAULT_FILTERS.ratingMax.toString()
+			),
 			yearMin: Number.parseInt(
 				searchParams.get('year.min') ?? DEFAULT_FILTERS.yearMin.toString(),
+				10
+			),
+			yearMax: Number.parseInt(
+				searchParams.get('year.max') ?? DEFAULT_FILTERS.yearMax.toString(),
 				10
 			)
 		}
@@ -51,7 +62,9 @@ export const useMovieFilter = () => {
 	useEffect(() => {
 		const newParams: Record<string, string> = {
 			'rating.min': filters.ratingMin.toFixed(1),
-			'year.min': filters.yearMin.toString()
+			'rating.max': filters.ratingMax.toFixed(1),
+			'year.min': filters.yearMin.toString(),
+			'year.max': filters.yearMax.toString()
 		}
 		if (filters.genres.length > 0) {
 			newParams.genres = filters.genres.join(',')
@@ -80,7 +93,11 @@ export const useMovieFilter = () => {
 			ratingMin:
 				newFilters.ratingMin !== undefined
 					? Math.round(newFilters.ratingMin * 10) / 10
-					: prev.ratingMin
+					: prev.ratingMin,
+			ratingMax:
+				newFilters.ratingMax !== undefined
+					? Math.round(newFilters.ratingMax * 10) / 10
+					: prev.ratingMax
 		}))
 	}, [])
 

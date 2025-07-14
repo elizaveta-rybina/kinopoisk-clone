@@ -101,13 +101,13 @@ export const HomeContent = () => {
 					)}
 
 					{!hasMore && movies.length > 0 && !error && (
-						<div className='text-center py-4'>
+						<div className='text-center py-4 text-black'>
 							<p>Нет больше фильмов для загрузки</p>
 						</div>
 					)}
 
 					{!isLoading && movies.length === 0 && !error && (
-						<div className='text-center py-8'>
+						<div className='text-center py-8 text-black'>
 							<p>Нет фильмов, соответствующих фильтрам</p>
 						</div>
 					)}
