@@ -1,9 +1,10 @@
 import type { Movie } from '@/app/api/types'
 import { favoritesStore } from '@/app/store/favorites'
-import { Modal } from '@/shared'
+import { BackButton, Modal } from '@/shared'
 import { MovieCard } from '@/widgets'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export const FavoritesPage = observer(() => {
 	const favorites = favoritesStore.favorites
@@ -11,6 +12,7 @@ export const FavoritesPage = observer(() => {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
 	const [isAddingToFavorites, setIsAddingToFavorites] = useState(true)
+	const navigate = useNavigate()
 
 	const handleFavoriteClick = (movie: Movie) => {
 		setSelectedMovie(movie)
@@ -37,6 +39,7 @@ export const FavoritesPage = observer(() => {
 
 	return (
 		<div className='pt-25 px-5 max-w-9/10 min-h-screen text-white mx-auto w-full relative'>
+			<BackButton navigate={navigate} />
 			<h1 className='text-4xl font-bold text-gray-800 mb-6'>Мое избранное</h1>
 
 			{favorites.length === 0 ? (

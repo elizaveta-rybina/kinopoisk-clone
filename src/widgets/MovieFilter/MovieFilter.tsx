@@ -13,7 +13,7 @@ export const MovieFilter = () => {
 	} = useMovieFilter()
 
 	return (
-		<div className='shadow-2xl p-6 w-full rounded max-w-xs space-y-8'>
+		<div className='shadow-2xl p-6 w-full rounded max-w-xs space-y-8 bg-white'>
 			<h2 className='text-2xl font-semibold text-black'>Фильтры</h2>
 
 			{genresError && (
@@ -36,7 +36,7 @@ export const MovieFilter = () => {
 			<div className='space-y-3'>
 				<label className='block text-sm font-medium text-orange-400'>
 					Рейтинг (мин):{' '}
-					<span className='text-white'>{ratingMin.toFixed(1)}</span>
+					<span className='text-black'>{ratingMin.toFixed(1)}</span>
 				</label>
 				<NumberStepper
 					value={ratingMin}
@@ -50,7 +50,7 @@ export const MovieFilter = () => {
 			{/* Year Filter */}
 			<div className='space-y-3'>
 				<label className='block text-sm font-medium text-orange-400'>
-					Год (мин): <span className='text-white'>{yearMin}</span>
+					Год (мин): <span className='text-black'>{yearMin}</span>
 				</label>
 				<NumberStepper
 					value={yearMin}

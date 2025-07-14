@@ -16,18 +16,21 @@ const DEFAULT_FILTERS: Filters = {
 
 export const useMovieFilter = () => {
 	const [searchParams, setSearchParams] = useSearchParams()
-	const [filters, setFilters] = useState<Filters>(() => ({
-		genres:
-			searchParams.get('genres')?.split(',').filter(Boolean) ??
-			DEFAULT_FILTERS.genres,
-		ratingMin: Number.parseFloat(
-			searchParams.get('rating.min') ?? DEFAULT_FILTERS.ratingMin.toString()
-		),
-		yearMin: Number.parseInt(
-			searchParams.get('yearMin') ?? DEFAULT_FILTERS.yearMin.toString(),
-			10
-		)
-	}))
+	const [filters, setFilters] = useState<Filters>(() => {
+		const genresParam = searchParams.get('genres')
+		return {
+			genres: genresParam
+				? genresParam.split(',').filter(Boolean)
+				: DEFAULT_FILTERS.genres,
+			ratingMin: Number.parseFloat(
+				searchParams.get('rating.min') ?? DEFAULT_FILTERS.ratingMin.toString()
+			),
+			yearMin: Number.parseInt(
+				searchParams.get('year.min') ?? DEFAULT_FILTERS.yearMin.toString(),
+				10
+			)
+		}
+	})
 	const [genresError, setGenresError] = useState<string | null>(null)
 
 	const availableGenres = useMemo(
@@ -46,16 +49,20 @@ export const useMovieFilter = () => {
 	}, [])
 
 	useEffect(() => {
-		const newParams = {
-			genres: filters.genres.join(','),
+		const newParams: Record<string, string> = {
 			'rating.min': filters.ratingMin.toFixed(1),
-			yearMin: filters.yearMin.toString()
+			'year.min': filters.yearMin.toString()
+		}
+		if (filters.genres.length > 0) {
+			newParams.genres = filters.genres.join(',')
 		}
 
 		const currentParams = Object.fromEntries(searchParams)
-		const hasChanged = Object.entries(newParams).some(
-			([key, value]) => value && currentParams[key] !== value
-		)
+		const hasChanged =
+			Object.keys(newParams).some(
+				key => currentParams[key] !== newParams[key]
+			) ||
+			(filters.genres.length === 0 && currentParams.genres !== undefined)
 
 		if (hasChanged) {
 			setSearchParams(newParams, { replace: true })

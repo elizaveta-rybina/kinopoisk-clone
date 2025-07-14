@@ -1,5 +1,5 @@
 import { getGenres } from '@/app/api'
-import { makeAutoObservable } from 'mobx'
+import { action, makeAutoObservable } from 'mobx'
 
 interface GenreResponse {
 	name: string
@@ -12,7 +12,9 @@ class GenresStore {
 	error: string | null = null
 
 	constructor() {
-		makeAutoObservable(this)
+		makeAutoObservable(this, {
+			fetchGenres: action
+		})
 	}
 
 	async fetchGenres() {
