@@ -8,7 +8,7 @@ import {
 	MovieDetailStats
 } from '@/entities'
 import { BackButton, Modal } from '@/shared'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 export const MovieDetail = () => {
@@ -25,6 +25,7 @@ export const MovieDetail = () => {
 			return
 		}
 
+		setMovie(null) // Ensure loading state is shown on ID change
 		getMovieById(id)
 			.then(data => setMovie(data))
 			.catch(err =>
@@ -32,12 +33,12 @@ export const MovieDetail = () => {
 			)
 	}, [id])
 
-	const handleFavoriteClick = (movie: Movie) => {
+	const handleFavoriteClick = useCallback((movie: Movie) => {
 		setIsAddingToFavorites(!favoritesStore.isFavorite(movie.id))
 		setIsModalOpen(true)
-	}
+	}, [])
 
-	const handleConfirmFavorite = () => {
+	const handleConfirmFavorite = useCallback(() => {
 		if (movie) {
 			if (isAddingToFavorites) {
 				favoritesStore.addFavorite(movie)
@@ -46,14 +47,26 @@ export const MovieDetail = () => {
 			}
 		}
 		setIsModalOpen(false)
-	}
+	}, [movie, isAddingToFavorites])
 
-	const handleCloseModal = () => {
+	const handleCloseModal = useCallback(() => {
 		setIsModalOpen(false)
+	}, [])
+
+	if (error) {
+		return <div className='text-red-500 p-6 text-center'>{error}</div>
 	}
 
-	if (error) return <div className='text-red-500 p-6'>{error}</div>
-	if (!movie) return <div className='text-gray-800 p-6'>Загрузка...</div>
+	if (!movie) {
+		return (
+			<div className='text-center py-8 pt-25'>
+				<div className='flex justify-center items-center'>
+					<div className='w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin'></div>
+				</div>
+				<p className='mt-4 text-lg text-gray-800'>Загрузка...</p>
+			</div>
+		)
+	}
 
 	return (
 		<div className='relative flex min-h-screen pt-20 px-16'>
@@ -83,7 +96,7 @@ export const MovieDetail = () => {
 				isOpen={isModalOpen}
 				onClose={handleCloseModal}
 				onConfirm={handleConfirmFavorite}
-				movieName={movie.name}
+				movieName={movie?.name || ''}
 				isAdding={isAddingToFavorites}
 			/>
 		</div>
