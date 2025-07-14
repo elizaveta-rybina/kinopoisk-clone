@@ -1,69 +1,92 @@
-# React + TypeScript + Vite
+# Kinopoisk Movies App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Простое приложение для просмотра информации о фильмах, созданное в рамках тестового задания от ВК.
 
-Currently, two official plugins are available:
+## Технологии
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- MobX
+- Kinopoisk API (https://kinopoisk.dev/)
 
-## Expanding the ESLint configuration
+## Функционал
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Просмотр списка фильмов
+- Просмотр детальной информации о фильме
+- Возможность добавление фильма в избранное
+- Фильтрация по:
+  - Жанрам
+  - Рейтингу (от и до)
+  - Году выпуска (от и до)
+- Адаптивный интерфейс
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Установка и запуск
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+1. Склонируйте репозиторий:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/elizaveta-rybina/kinopoisk-clone
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Установите зависимости:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+3. Настройте окружение:
+
+- Получите API токен в @kinopoiskdev_bot (Telegram)
+- Создайте файл `.env` в корне проекта на основе `.env.default`:
+
+```env
+VITE_API_KEY=ваш_токен_здесь
+```
+
+4. Запустите приложение:
+
+```bash
+npm run dev
+```
+
+Приложение будет доступно по адресу: [http://localhost:5173](http://localhost:5173)
+
+## Структура проекта
+
+```
+/src
+  /app          # API взаимодействие
+  /entities     # Базовые компоненты
+  /features     # Основные фичи приложения
+  /pages        # Страницы приложения
+  /shared       # Общие компоненты
+  /widgets      # Комплексные компоненты
+```
+
+## Скриншоты
+
+### Главная страница
+
+![Главная страница](./screenshots/главная_страница.png)
+
+### Карточка фильма при наведении
+
+![Карточка фильма при наведении](./screenshots/карточка_при_наведении.png)
+
+### Фильтрация
+
+![Фильтрация](./screenshots/фильтрация.png)
+
+### Подробная информация о фильме
+
+![Подробная информация о фильме](./screenshots/подробная_информация.png)
+
+### Модальное окно
+
+![Модальное окно](./screenshots/добавление_в_избранное.png)
+
+### Вкладка избранное
+
+![Вкладка избранное](./screenshots/вкладка_избранное.png)
