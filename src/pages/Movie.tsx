@@ -1,13 +1,13 @@
 import { getMovieById } from '@/app/api'
 import type { Movie } from '@/app/api/types'
 import { favoritesStore } from '@/app/store/favorites'
-import { BackButton, Modal } from '@/shared'
 import {
 	MovieDetailActions,
 	MovieDetailGenres,
 	MovieDetailHeader,
 	MovieDetailStats
-} from '@/widgets'
+} from '@/entities'
+import { BackButton, Modal } from '@/shared'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
